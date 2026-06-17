@@ -261,7 +261,7 @@ function SearchResults() {
   }, [searchData]);
 
   const handleProceed = () => {
-    if (!canProceed) return;
+    if (!canProceed || !searchData) return;
 
     const params = new URLSearchParams();
     Object.entries(searchData).forEach(([key, value]) => {

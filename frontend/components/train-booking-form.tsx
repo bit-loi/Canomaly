@@ -49,7 +49,7 @@ export function TrainBookingForm() {
     infants: 0,
   });
 
-  const [stationList, setStationList] = useState<object[]>([]);
+  const [stationList, setStationList] = useState<{ id: number, name: string }[]>([]);
   // const [stationIDList, setStationIDList] = useState<string[]>([]);
   const [isLoadingStations, setIsLoadingStations] = useState(false);
 

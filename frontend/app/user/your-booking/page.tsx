@@ -237,8 +237,8 @@ function BookingDetails() {
   }
 
   const { searchData, departureTrain, returnTrain } = bookingDetails;
-  const departurePrice = parseFloat(departureTrain.price) || 0;
-  const returnPrice = parseFloat(returnTrain?.price) || 0;
+  const departurePrice = departureTrain.price || 0;
+  const returnPrice = returnTrain?.price || 0;
   const totalPrice =
     (departurePrice + returnPrice) * parseInt(searchData.adults || "0");
 
