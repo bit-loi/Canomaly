@@ -39,6 +39,27 @@ function InfoCard({
   );
 }
 
+type TrainData = {
+  name: string;
+  class: string;
+  departureTime: string;
+  arrivalTime: string;
+  duration: string;
+  price: number;
+  class_id?: number;
+};
+
+type BookingSearchData = {
+  operator: string;
+  tripType: string;
+  origin: string;
+  destination: string;
+  departure: string;
+  returnDate: string;
+  adults: string;
+  infants: string;
+};
+
 function TripDetailCard({
   train,
   date,
@@ -46,7 +67,7 @@ function TripDetailCard({
   destination,
   isReturn = false,
 }: {
-  train: any;
+  train: TrainData;
   date: string;
   origin: string;
   destination: string;
@@ -103,10 +124,6 @@ type AdultPassenger = {
   error: string;
 };
 
-type InfantPassenger = {
-  name: string;
-  birthDate: string;
-};
 
 function validateId(value: string, type: "KTP" | "PASPOR") {
   if (type === "KTP") {
@@ -117,12 +134,15 @@ function validateId(value: string, type: "KTP" | "PASPOR") {
   return "";
 }
 
+type BookingDetailsState = {
+  searchData: BookingSearchData;
+  departureTrain: TrainData;
+  returnTrain: TrainData | null;
+};
+
 function BookingDetails() {
-  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [bookingDetails, setBookingDetails] = useState<BookingDetailsState | null>(null);
   const [adultPassengers, setAdultPassengers] = useState<AdultPassenger[]>([]);
-  const [infantPassengers, setInfantPassengers] = useState<InfantPassenger[]>(
-    []
-  );
   const [departureStationId, setDepartureStationId] = useState<number | null>(
     null
   );
@@ -167,8 +187,16 @@ function BookingDetails() {
       params.delete("departureTrain");
       params.delete("returnTrain");
 
-      const searchData: any = {};
-      for (const [key, value] of params.entries()) searchData[key] = value;
+      const searchData: BookingSearchData = {
+        operator: params.get("operator") ?? "",
+        tripType: params.get("tripType") ?? "",
+        origin: params.get("origin") ?? "",
+        destination: params.get("destination") ?? "",
+        departure: params.get("departure") ?? "",
+        returnDate: params.get("returnDate") ?? "",
+        adults: params.get("adults") ?? "1",
+        infants: params.get("infants") ?? "0",
+      };
 
       try {
         const departureTrain = departureTrainStr
@@ -182,7 +210,6 @@ function BookingDetails() {
         setBookingDetails({ searchData, departureTrain, returnTrain });
 
         const adultsCount = parseInt(searchData.adults || "1");
-        const infantsCount = parseInt(searchData.infants || "0");
 
         setAdultPassengers(
           Array.from({ length: adultsCount }).map(() => ({
@@ -191,13 +218,6 @@ function BookingDetails() {
             idType: "KTP" as const,
             idValue: "",
             error: "",
-          }))
-        );
-
-        setInfantPassengers(
-          Array.from({ length: infantsCount }).map(() => ({
-            name: "",
-            birthDate: "",
           }))
         );
       } catch (e) {

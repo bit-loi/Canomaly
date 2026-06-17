@@ -24,7 +24,7 @@ export default function LandingPage() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
+      transition: { duration: 0.6, ease: "easeOut" as const },
     },
   };
   const gridContainerVariants = {
@@ -285,7 +285,7 @@ export default function LandingPage() {
                 See Canomaly in Action
               </h2>
               <p className="mb-8 text-lg text-muted-foreground text-pretty">
-                Don't just read about our features—see them. Our platform brings
+                Don&apos;t just read about our features—see them. Our platform brings
                 everything together in one clear interface, helping your team
                 spot and prevent fraud.
               </p>

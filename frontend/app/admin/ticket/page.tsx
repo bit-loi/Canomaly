@@ -111,7 +111,7 @@ export default function TicketsLogPage() {
       if (error) {
         console.error("Error fetching tickets:", error.message);
       } else {
-        setTickets((data as Ticket[]) || []);
+        setTickets((data as unknown as Ticket[]) || []);
         setTotalTickets(count || 0);
       }
       setLoading(false);

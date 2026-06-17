@@ -45,7 +45,7 @@ export default function AnomalyDetectionPage() {
         .order("created_at", { ascending: false });
 
       if (!error && data) {
-        const mapped: Anomaly[] = data.map((row: any) => ({
+        const mapped: Anomaly[] = data.map((row: { id: string; anomaly_score: number; num_tickets: number; review_status: string; created_at: string; anomaly_label_id: string | null; total_amount: number }) => ({
           id: row.id,
           title: row.anomaly_label_id
             ? `Pattern: ${row.anomaly_label_id}`
@@ -84,7 +84,7 @@ export default function AnomalyDetectionPage() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "transactions" },
-        (payload: any) => {
+        (payload: { new: { id: string; fraud_flag: boolean; anomaly_score: number; num_tickets: number; review_status: string; created_at: string; anomaly_label_id: string | null; total_amount: number } }) => {
           if (!payload.new.fraud_flag) return;
 
           const anomaly: Anomaly = {
@@ -125,7 +125,9 @@ export default function AnomalyDetectionPage() {
       )
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [supabase]);
 
   const triggerHeboh = (anomaly: Anomaly) => {

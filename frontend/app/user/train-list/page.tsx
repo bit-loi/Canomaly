@@ -198,7 +198,16 @@ function TrainCard({
 // Main logic component for fetching, displaying, and handling selections
 function SearchResults() {
   const router = useRouter();
-  const [searchData, setSearchData] = useState<any>(null);
+  const [searchData, setSearchData] = useState<{
+    operator: string;
+    tripType: string;
+    origin: string;
+    destination: string;
+    departure: string;
+    returnDate: string | null;
+    adults: string;
+    infants: string;
+  } | null>(null);
   const [selectedDeparture, setSelectedDeparture] = useState<Train | null>(
     null
   );

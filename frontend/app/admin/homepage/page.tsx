@@ -74,7 +74,7 @@ export default function DashboardPage() {
         .order("created_at", { ascending: false });
 
       if (anomaliesData) {
-        const mappedAnomalies: Anomaly[] = anomaliesData.map((row: any) => ({
+        const mappedAnomalies: Anomaly[] = anomaliesData.map((row: { id: string; anomaly_score: number; review_status: string; created_at: string; anomaly_label_id: string | null }) => ({
           id: row.id,
           type: row.anomaly_label_id
             ? `Pattern: ${row.anomaly_label_id}`
@@ -85,7 +85,7 @@ export default function DashboardPage() {
               : row.anomaly_score > 0.5
               ? "medium"
               : "low",
-          status: row.review_status || "active",
+          status: (row.review_status as "active" | "investigating" | "resolved") || "active",
           created_at: row.created_at,
         }));
         setAnomalies(mappedAnomalies);
@@ -103,7 +103,7 @@ export default function DashboardPage() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "tickets" },
         (payload) => {
-          setTickets((prev) => [...prev, payload.new]);
+          setTickets((prev) => [...prev, payload.new as Ticket]);
         }
       )
       .subscribe();
@@ -126,7 +126,7 @@ export default function DashboardPage() {
                 : payload.new.anomaly_score > 0.5
                 ? "medium"
                 : "low",
-            status: payload.new.review_status || "active",
+            status: (payload.new.review_status as "active" | "investigating" | "resolved") || "active",
             created_at: payload.new.created_at,
           };
           setAnomalies((prev) => [anomaly, ...prev]);
@@ -152,6 +152,7 @@ export default function DashboardPage() {
     anomalies.length > 0
       ? ((resolvedToday / anomalies.length) * 100).toFixed(1) + "%"
       : "0%";
+  void detectionRate;
 
   // Chart data preparation
   const requestsData = tickets.map((t) => ({
@@ -163,7 +164,7 @@ export default function DashboardPage() {
   }));
 
   const anomalyData = Object.values(
-    anomalies.reduce((acc: any, a) => {
+    anomalies.reduce((acc, a) => {
       const hour =
         new Date(a.created_at).getHours().toString().padStart(2, "0") + ":00";
       if (!acc[hour]) acc[hour] = { time: hour, detected: 0, resolved: 0 };
@@ -216,7 +217,7 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Active Anomalies"
-            value={loading ? "..." : 7}
+            value={loading ? "..." : activeAnomalies.toString()}
             change="Realtime data"
             changeType={activeAnomalies > 0 ? "negative" : "positive"}
             icon={AlertTriangle}
